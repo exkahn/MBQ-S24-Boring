@@ -20,11 +20,10 @@ raw.data <- na.omit(raw.data1)
 ## Distribution is NOT Gaussian
 
 ## Decided to use GLM with point counts (Poisson distribution), because ratios were not neatly distributed
-model_poisson_L_onLive <- glm(L_onLive ~ number_total_points +
-               proportion_live_coral + proportion_dead_coral + proportion_turf +
-               proportion_macroalgae + proportion_rock + proportion_invertebrate + depth_to_benthos + D_liveOnLive + D_deadOnLive +
-                 D_liveOnDead + D_deadOnDead + tridacna + spirobranchus +
-               total_live_D + total_D + percent_N_jan + percent_N_may + percent_N_aug + 
+model_poisson_L_onLive <- glm(L_onLive ~ 
+               live_coral_total + dead_coral_total + turf_total +
+               macroalgae_total + rock_total + invertebrate_total + depth_to_benthos + 
+               percent_N_jan + percent_N_may + percent_N_aug + 
                  jan_d15 + may_d15 + aug_d15 + avg_speed +
                  altDistance, 
              family = poisson, 
@@ -32,19 +31,16 @@ model_poisson_L_onLive <- glm(L_onLive ~ number_total_points +
 
 step(model_poisson_L_onLive)
 
-step_L_onLive <- glm(formula = L_onLive ~ number_total_points + proportion_live_coral + 
-                       proportion_dead_coral + proportion_turf + proportion_macroalgae + 
-                       proportion_rock + proportion_invertebrate + depth_to_benthos + 
-                       D_liveOnLive + D_deadOnLive + spirobranchus + percent_N_jan + 
-                       percent_N_aug + jan_d15 + may_d15 + aug_d15 + avg_speed + 
-                       altDistance, family = poisson, data = raw.data)
+step_L_onLive <- glm(formula = L_onLive ~ live_coral_total + dead_coral_total + 
+                       turf_total + rock_total + invertebrate_total + depth_to_benthos + 
+                       percent_N_jan + percent_N_aug + jan_d15 + may_d15 + aug_d15 + 
+                       avg_speed + altDistance, family = poisson, data = raw.data)
+summary(step_L_onLive)
 ## checks which variables should be removed for better fitting model
 
-model_poisson_L_onDead <- glm(L_onDead ~ number_total_points +
-                                proportion_live_coral + proportion_dead_coral + proportion_turf +
-                                proportion_macroalgae + proportion_rock + proportion_invertebrate + depth_to_benthos + D_liveOnLive + D_deadOnLive +
-                                D_liveOnDead + D_deadOnDead + tridacna + spirobranchus +
-                                total_live_D + total_D + percent_N_jan + percent_N_may + percent_N_aug + 
+model_poisson_L_onDead <- glm(L_onDead ~ live_coral_total + dead_coral_total + turf_total +
+                                macroalgae_total + rock_total + invertebrate_total + depth_to_benthos + 
+                                percent_N_jan + percent_N_may + percent_N_aug + 
                                 jan_d15 + may_d15 + aug_d15 + avg_speed +
                                 altDistance, 
                               family = poisson, 
@@ -52,92 +48,81 @@ model_poisson_L_onDead <- glm(L_onDead ~ number_total_points +
 
 
 step(model_poisson_L_onDead)
-step_L_onDead <- glm(formula = L_onDead ~ number_total_points + proportion_live_coral + 
-                       proportion_dead_coral + proportion_turf + proportion_macroalgae + 
-                       proportion_rock + proportion_invertebrate + depth_to_benthos + 
-                       D_liveOnLive + D_liveOnDead + percent_N_jan + percent_N_may + 
-                       percent_N_aug + jan_d15 + may_d15 + avg_speed + altDistance, 
-                     family = poisson, data = raw.data)
+step_L_onDead <- glm(formula = L_onDead ~ live_coral_total + dead_coral_total + 
+                       turf_total + macroalgae_total + rock_total + invertebrate_total + 
+                       depth_to_benthos + percent_N_jan + percent_N_may + percent_N_aug + 
+                       jan_d15 + may_d15 + avg_speed + altDistance, family = poisson, 
+                     data = raw.data)
+summary(step_L_onDead)
 ## checks which variables should be removed for better fitting model
 
-model_poisson_D_liveOnLive_count <- glm(D_liveOnLive ~ number_total_points +
-                                    proportion_live_coral + proportion_dead_coral + proportion_turf +
-                                    proportion_macroalgae + proportion_rock + proportion_invertebrate + 
-                                      depth_to_benthos + L_onLive + L_onDead + tridacna + spirobranchus +
-                                    total_L + percent_N_jan + percent_N_may + percent_N_aug + 
+model_poisson_D_liveOnLive_count <- glm(D_liveOnLive ~ live_coral_total + dead_coral_total + 
+                                          turf_total + macroalgae_total + rock_total + invertebrate_total + 
+                                      depth_to_benthos + percent_N_jan + percent_N_may + percent_N_aug + 
                                     jan_d15 + may_d15 + aug_d15 + avg_speed +
                                     altDistance, 
                                   family = poisson, 
                                   data = raw.data)
 
 step(model_poisson_D_liveOnLive_count)
-step_D_liveOnLive <- glm(formula = D_liveOnLive ~ number_total_points + proportion_live_coral + 
-                           proportion_dead_coral + proportion_turf + proportion_macroalgae + 
-                           proportion_rock + proportion_invertebrate + depth_to_benthos + 
-                           L_onLive + tridacna + percent_N_jan + percent_N_may + percent_N_aug + 
-                           jan_d15 + may_d15 + altDistance, family = poisson, data = raw.data)
+step_D_liveOnLive <- glm(formula = D_liveOnLive ~ live_coral_total + invertebrate_total + 
+                           depth_to_benthos + percent_N_jan + percent_N_may + avg_speed + 
+                           altDistance, family = poisson, data = raw.data)
+summary(step_D_liveOnLive)
 ## checks which variables should be removed for better fitting model
 
 
-model_poisson_D_liveOnDead_count <- glm(D_liveOnDead ~ number_total_points +
-                                          proportion_live_coral + proportion_dead_coral + proportion_turf +
-                                          proportion_macroalgae + proportion_rock + proportion_invertebrate + 
-                                          depth_to_benthos + L_onLive + L_onDead + tridacna + spirobranchus +
-                                          total_L + percent_N_jan + percent_N_may + percent_N_aug + 
+model_poisson_D_liveOnDead_count <- glm(D_liveOnDead ~ 
+                                          live_coral_total + dead_coral_total + 
+                                          turf_total + macroalgae_total + rock_total + invertebrate_total + 
+                                          depth_to_benthos + percent_N_jan + percent_N_may + percent_N_aug + 
                                           jan_d15 + may_d15 + aug_d15 + avg_speed +
                                           altDistance, 
                                         family = poisson, 
                                         data = raw.data)
 
 step(model_poisson_D_liveOnDead_count)
-step_D_liveOnDead <- glm(formula = D_liveOnDead ~ number_total_points + proportion_live_coral + 
-                           proportion_dead_coral + proportion_turf + proportion_macroalgae + 
-                           proportion_rock + proportion_invertebrate + depth_to_benthos + 
-                           L_onDead + spirobranchus + percent_N_aug + jan_d15 + may_d15 + 
-                           aug_d15 + avg_speed + altDistance, family = poisson, data = raw.data)
-
+step_D_liveOnDead <- glm(formula = D_liveOnDead ~ live_coral_total + dead_coral_total + 
+                           turf_total + macroalgae_total + rock_total + percent_N_aug + 
+                           jan_d15 + may_d15 + avg_speed + altDistance, family = poisson, 
+                         data = raw.data)
+summary(step_D_liveOnDead)
 
 
 ## checks which variables should be removed for better fitting model
 
-model_poisson_D_deadOnLive_count <- glm(D_deadOnLive ~ number_total_points +
-                                          proportion_live_coral + proportion_dead_coral + proportion_turf +
-                                          proportion_macroalgae + proportion_rock + proportion_invertebrate + 
-                                          depth_to_benthos + L_onLive + L_onDead + tridacna + spirobranchus +
-                                          total_L + percent_N_jan + percent_N_may + percent_N_aug + 
+model_poisson_D_deadOnLive_count <- glm(D_deadOnLive ~ live_coral_total + dead_coral_total + 
+                                          turf_total + macroalgae_total + rock_total + invertebrate_total + 
+                                          depth_to_benthos + percent_N_jan + percent_N_may + percent_N_aug + 
                                           jan_d15 + may_d15 + aug_d15 + avg_speed +
                                           altDistance, 
                                         family = poisson, 
                                         data = raw.data)
 
 step(model_poisson_D_deadOnLive_count)
-step_D_deadOnLive <- glm(formula = D_deadOnLive ~ proportion_live_coral + proportion_dead_coral + 
-                           depth_to_benthos + L_onLive + L_onDead + tridacna + percent_N_jan + 
-                           percent_N_may + percent_N_aug + jan_d15 + may_d15 + aug_d15 + 
-                           avg_speed, family = poisson, data = raw.data)
-
+step_D_deadOnLive <- glm(formula = D_deadOnLive ~ dead_coral_total + macroalgae_total + 
+                           depth_to_benthos + percent_N_jan + percent_N_may + percent_N_aug + 
+                           jan_d15 + may_d15 + aug_d15 + avg_speed, family = poisson, 
+                         data = raw.data)
+summary(step_D_deadOnLive)
 
 
 ## checks which variables should be removed for better fitting model
 
 
-model_poisson_D_deadOnDead_count <- glm(D_deadOnDead ~ number_total_points +
-                                          proportion_live_coral + proportion_dead_coral + proportion_turf +
-                                          proportion_macroalgae + proportion_rock + proportion_invertebrate + 
-                                          depth_to_benthos + L_onLive + L_onDead + tridacna + spirobranchus +
-                                          total_L + percent_N_jan + percent_N_may + percent_N_aug + 
+model_poisson_D_deadOnDead_count <- glm(D_deadOnDead ~ live_coral_total + dead_coral_total + 
+                                          turf_total + macroalgae_total + rock_total + invertebrate_total + 
+                                          depth_to_benthos + percent_N_jan + percent_N_may + percent_N_aug + 
                                           jan_d15 + may_d15 + aug_d15 + avg_speed +
                                           altDistance, 
                                         family = poisson, 
                                         data = raw.data)
 
 step(model_poisson_D_deadOnDead_count)
-step_D_deadOnDead <- glm(formula = D_deadOnDead ~ number_total_points + proportion_live_coral + 
-                           proportion_dead_coral + proportion_turf + proportion_macroalgae + 
-                           proportion_invertebrate + tridacna + percent_N_jan + percent_N_may + 
-                           percent_N_aug + jan_d15 + may_d15 + aug_d15 + avg_speed + 
-                           altDistance, family = poisson, data = raw.data)
-
-
-
+step_D_deadOnDead <- glm(formula = D_deadOnDead ~ live_coral_total + dead_coral_total + 
+                           turf_total + macroalgae_total + rock_total + invertebrate_total + 
+                           percent_N_jan + percent_N_may + percent_N_aug + jan_d15 + 
+                           may_d15 + aug_d15 + avg_speed + altDistance, family = poisson, 
+                         data = raw.data)
+summary(step_D_deadOnDead)
 ## checks which variables should be removed for better fitting model
