@@ -58,8 +58,8 @@ model_L_onLive_z <- glm(L_onLive ~
                                 macroalgae_z + rock_z + invertebrate_z + depth_to_benthos_z + 
                                 percent_N_jan_z + percent_N_may_z + percent_N_aug_z + 
                                 jan_d15_z + may_d15_z + aug_d15_z + 
-                          NHW_speed_z + NLW_speed_z + ELW_speed_z +
-                          NHW_speed_offshore_z + NLW_speed_offshore_z + ELW_speed_offshore_z
+                                NHW_speed_z + NLW_speed_z + ELW_speed_z +
+                                NHW_speed_offshore_z + NLW_speed_offshore_z + ELW_speed_offshore_z
                                 #avg_speed_z + avg_speed_offshore_z +
                                 #+distanceOutBay_z
                           , 
@@ -73,6 +73,8 @@ step_L_onLive_z <- glm(formula = L_onLive ~ live_coral_z + dead_coral_z + turf_z
                          percent_N_may_z + percent_N_aug_z + jan_d15_z + may_d15_z + 
                          aug_d15_z + NLW_speed_z, family = poisson, data = z.data)
 summary(step_L_onLive_z)
+
+write.csv(summary.glm(step_L_onLive_z)$coefficients, "L_onLive_coefficients.csv")
 
 
 ##### L on dead (z-score)
@@ -94,6 +96,8 @@ step_L_onDead_z <- glm(formula = L_onDead ~ live_coral_z + dead_coral_z + turf_z
                        data = z.data)
 summary(step_L_onDead_z)
 
+write.csv(summary.glm(step_L_onDead_z)$coefficients, "L_onDead_coefficients.csv")
+
 
 ##### Live D on live (z-score)
 model_D_liveOnLive_z <- glm(D_liveOnLive ~ 
@@ -112,6 +116,9 @@ step_D_liveOnLive_z <- glm(formula = D_liveOnLive ~ live_coral_z + invertebrate_
                              may_d15_z + aug_d15_z + NHW_speed_z + NLW_speed_z, family = poisson, 
                            data = z.data)
 summary(step_D_liveOnLive_z)
+
+write.csv(summary.glm(step_D_liveOnLive_z)$coefficients, "D_liveOnLive_coefficients.csv")
+
 
 
 ##### Live D on dead (z-score)
@@ -133,6 +140,8 @@ step_D_liveOnDead_z <- glm(formula = D_liveOnDead ~ live_coral_z + dead_coral_z 
                            data = z.data)
 summary(step_D_liveOnDead_z)
 
+write.csv(summary.glm(step_D_liveOnDead_z)$coefficients, "D_liveOnDead_coefficients.csv")
+
 
 ##### Dead D on live (z-score)
 model_D_deadOnLive_z <- glm(D_deadOnLive ~ 
@@ -151,6 +160,7 @@ step_D_deadOnLive_z <- glm(formula = D_deadOnLive ~ dead_coral_z + macroalgae_z 
                              aug_d15_z + NHW_speed_z + NLW_speed_z, family = poisson, 
                            data = z.data)
 summary(step_D_deadOnLive_z)
+write.csv(summary.glm(step_D_deadOnLive_z)$coefficients, "D_deadOnLive_coefficients.csv")
 
 
 ##### Dead D on dead (z-score)
@@ -171,12 +181,15 @@ step_D_deadOnDead_z <- glm(formula = D_deadOnDead ~ live_coral_z + dead_coral_z 
                              aug_d15_z + NHW_speed_z + NLW_speed_z, family = poisson, 
                            data = z.data)
 summary(step_D_deadOnDead_z)
+write.csv(summary.glm(step_D_deadOnDead_z)$coefficients, "D_deadOnDead_coefficients.csv")
 
 
 
 
 
-######## Old models (not z-scored, effect sizes are not)
+
+#############################################################
+######## Old models (not z-scored, effect sizes are not meaningful)
 model_poisson_L_onLive <- glm(L_onLive ~ 
                live_coral_total + turf_total + macroalgae_total + 
                  depth_to_benthos + 
