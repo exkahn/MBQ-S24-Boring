@@ -52,6 +52,17 @@ z.data <- raw.data %>% mutate(live_coral_z = z.score(live_coral_total),
                               avg_speed_offshore_z = z.score(avg_speed_offshore),
                               distanceOutBay_z = z.score(distanceOutBay))
 
+
+##### Trying to figure out overdispersion in my Poisson models
+overdisp_fun <- function(model) {
+  rdf <- df.residual(model)
+  rp <- residuals(model,type="pearson")
+  Pearson.chisq <- sum(rp^2)
+  prat <- Pearson.chisq/rdf
+  pval <- pchisq(Pearson.chisq, df=rdf, lower.tail=FALSE)
+  c(chisq=Pearson.chisq,ratio=prat,rdf=rdf,p=pval)
+}
+
 ##### L on live (z-score)
 model_L_onLive_z <- glm(L_onLive ~ 
                                 live_coral_z + dead_coral_z + turf_z +
@@ -73,8 +84,43 @@ step_L_onLive_z <- glm(formula = L_onLive ~ live_coral_z + dead_coral_z + turf_z
                          percent_N_may_z + percent_N_aug_z + jan_d15_z + may_d15_z + 
                          aug_d15_z + NLW_speed_z, family = poisson, data = z.data)
 summary(step_L_onLive_z)
-
 write.csv(summary.glm(step_L_onLive_z)$coefficients, "L_onLive_coefficients.csv")
+
+
+
+overdisp_fun(step_L_onLive_z)
+### DEFINITELY overdispersed --> means I should actually use a quasilikelikhood estimation?
+
+library(broom.mixed)
+tidy_quasi <- function(model, phi=overdisp_fun(model)["ratio"],
+                       conf.level=0.95) {
+  tt <- (tidy(model, effects="fixed")
+         %>% mutate(std.error=std.error*sqrt(phi),
+                    statistic=estimate/std.error,
+                    p.value=2*pnorm(abs(statistic), lower.tail=FALSE))
+  )
+  return(tt)
+}
+
+tidy_quasi(step_L_onLive_z)
+
+
+library(Hmisc)
+rcorr(as.matrix(z.data[,c(59:62, 66:75, 81)]))
+##### SHOWS I NEED TO SIMPLIFY MODEL BY USING THE ANNUAL QUASI-MEAN VALUE FOR WATER FLOW, ALL HIGHLY CORRELATED
+
+
+#### THIS IS THE WAY TO GO (I THINK)
+quasi_L_onLive_z <- glm(L_onLive ~ 
+                          live_coral_z + dead_coral_z + turf_z +
+                          macroalgae_z + depth_to_benthos_z + 
+                          percent_N_jan_z + percent_N_may_z + percent_N_aug_z + 
+                          jan_d15_z + may_d15_z + aug_d15_z + 
+                          NHW_speed_z + NLW_speed_z + ELW_speed_z, 
+                        family = quasipoisson, 
+                        data = z.data)
+
+
 
 
 ##### L on dead (z-score)
@@ -95,6 +141,8 @@ step_L_onDead_z <- glm(formula = L_onDead ~ live_coral_z + dead_coral_z + turf_z
                          aug_d15_z + NHW_speed_z + NLW_speed_z, family = poisson, 
                        data = z.data)
 summary(step_L_onDead_z)
+overdisp_fun(step_L_onDead_z)
+tidy_quasi(step_L_onDead_z)
 
 write.csv(summary.glm(step_L_onDead_z)$coefficients, "L_onDead_coefficients.csv")
 
@@ -116,6 +164,8 @@ step_D_liveOnLive_z <- glm(formula = D_liveOnLive ~ live_coral_z + invertebrate_
                              may_d15_z + aug_d15_z + NHW_speed_z + NLW_speed_z, family = poisson, 
                            data = z.data)
 summary(step_D_liveOnLive_z)
+overdisp_fun(step_D_liveOnLive_z)
+tidy_quasi(step_D_liveOnLive_z)
 
 write.csv(summary.glm(step_D_liveOnLive_z)$coefficients, "D_liveOnLive_coefficients.csv")
 
@@ -139,6 +189,8 @@ step_D_liveOnDead_z <- glm(formula = D_liveOnDead ~ live_coral_z + dead_coral_z 
                              may_d15_z + aug_d15_z + NHW_speed_z + NLW_speed_z, family = poisson, 
                            data = z.data)
 summary(step_D_liveOnDead_z)
+overdisp_fun(step_D_liveOnDead_z)
+quasi_table(step_D_liveOnDead_z)
 
 write.csv(summary.glm(step_D_liveOnDead_z)$coefficients, "D_liveOnDead_coefficients.csv")
 
